@@ -1,0 +1,38 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+steps:
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host Starting the synchronization process
+      
+      mkdir "D:\test\copyrepo"
+      $sourceURL = "https://ttg27jlk6ov623zdxnio54kzayesbm2hll7wvfrtuigkogb6dsya@dev.azure.com/venkateshrathod0819/test/_git/test"
+      $destURL = "https://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@github.com/venki19/test.git"
+      
+      
+      Set-Location "D:\test\copyrepo"
+      git clone --mirror $sourceURL
+      
+      Set-Location "D:\test\copyrepo\test.git"
+      Write-Host "*****Git removing remote origin****"
+      git remote rm origin
+      
+      Write-Output "*****Git remote add****"
+      git remote add --mirror=fetch origin $destURL
+      
+      Write-Output "*****Git fetch origin****"
+      git fetch $sourceURL
+      
+      Write-Output "*****Git push to Azure Repos****"
+      git push origin --all -f
